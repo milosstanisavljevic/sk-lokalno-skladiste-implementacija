@@ -3,6 +3,8 @@ import java.util.Scanner;
 
 public class LokalnoSkladiste{
 
+    private String rootDirectoryPath;
+    private static int brojac;
     public LokalnoSkladiste() {
     }
 
@@ -41,6 +43,7 @@ public class LokalnoSkladiste{
     public void createRoot(String path,String name){
         path = path + '\\' + name;
         File root = new File(path);
+        setRootDirectoryPath(path);
         boolean b = root.mkdir();
         if(b){
             System.out.println("root is created successfully");
@@ -54,5 +57,9 @@ public class LokalnoSkladiste{
         }else{
             createRoot(path,"newRoot");
         }
+    }
+
+    public void setRootDirectoryPath(String rootDirectoryPath) {
+        this.rootDirectoryPath = rootDirectoryPath;
     }
 }
