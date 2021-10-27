@@ -1,4 +1,3 @@
-import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,6 +11,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     private String rootDirectoryPath;
     private static int brojac;
+
 
 
     public LokalnoSkladiste() {
@@ -36,7 +36,12 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         setRootDirectoryPath(path);
         boolean b = root.mkdir();
         if(b){
-            System.out.println("root is created successfully");
+            try {
+                makeConfig(path);
+                makeUser(path);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else
             System.out.println("Error!");
     }
