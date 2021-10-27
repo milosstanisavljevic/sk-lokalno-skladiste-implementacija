@@ -1,46 +1,36 @@
-import java.io.File;
-import java.util.Scanner;
+import com.google.gson.Gson;
 
-public class LokalnoSkladiste{
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+
+
+public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     private String rootDirectoryPath;
     private static int brojac;
+
+
     public LokalnoSkladiste() {
     }
 
+    public void checkPrivileges() {
+    }
 
-    //    public void createRoot(String path,String name){
-//       path = path + '\'' + name;
-//       File root = new File(path);
-//       boolean b = root.mkdir();
-//       if(b){
-//           System.out.println("root is created successfully");
-//       }else
-//           System.out.println("Error!");
-//    }
+    @Override
+    public void makeConfig(String path) throws Exception {
+        super.makeConfig(path);
+    }
 
+    @Override
+    public void makeUser(String path) throws Exception {
+        super.makeUser(path);
+    }
 
-    //public static void main(String[] args) {
-
-        //createRoot("C:\\Users\\Milos\\OneDrive\\Desktop","Proba");
-        /*System.out.println("Enter the path where you want to create a folder: ");
-        Scanner sc = new Scanner(System.in);
-        String path = sc.next();
-        //Using Scanner class to get the folder name from the user
-        System.out.println("Enter the name of the desired a directory: ");
-        path = path+sc.next();
-        //Instantiate the File class
-        File f1 = new File(path);
-        //Creating a folder using mkdir() method
-        boolean bool = f1.mkdir();
-        if(bool){
-            System.out.println("Folder is created successfully");
-        }else{
-            System.out.println("Error Found!");
-        }*/
-
-    //}
-    public void createRoot(String path,String name){
+    public void createRoot(String path, String name){
         path = path + '\\' + name;
         File root = new File(path);
         setRootDirectoryPath(path);
@@ -58,6 +48,7 @@ public class LokalnoSkladiste{
             createRoot(path,"newRoot");
         }
     }
+
 
     public void setRootDirectoryPath(String rootDirectoryPath) {
         this.rootDirectoryPath = rootDirectoryPath;
