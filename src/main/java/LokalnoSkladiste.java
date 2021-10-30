@@ -21,13 +21,13 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void makeConfig(String path) throws Exception {
-        super.makeConfig(path);
+    public void makeDefaultConfig(String path) {
+        super.makeDefaultConfig(path);
     }
 
     @Override
-    public void makeUser(String path) throws Exception {
-        super.makeUser(path);
+    public void makeDefaultUser(String path) {
+        super.makeDefaultUser(path);
     }
 
     public void createRoot(String path, String name){
@@ -37,8 +37,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         boolean b = root.mkdir();
         if(b){
             try {
-                makeConfig(path);
-                makeUser(path);
+                makeDefaultConfig(path);
+                makeDefaultUser(path);
+                createFile("probica.txt");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -53,7 +54,24 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             createRoot(path,"newRoot");
         }
     }
+    public void createFile(String fileName){
+        String p = getRootDirectoryPath() + "\\" + fileName;
+        File f  = new File(p);
+        try {
+            f.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void createFolder(String folderName){
+        String p = getRootDirectoryPath() + "\\" +folderName;
+        File f = new File(p);
+        f.mkdir();
+    }
 
+    public String getRootDirectoryPath() {
+        return rootDirectoryPath;
+    }
 
     public void setRootDirectoryPath(String rootDirectoryPath) {
         this.rootDirectoryPath = rootDirectoryPath;
