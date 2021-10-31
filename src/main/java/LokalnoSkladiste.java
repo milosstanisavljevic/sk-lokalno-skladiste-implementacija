@@ -9,6 +9,10 @@ import java.util.Map;
 
 public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
+    static {
+        Manager.registerImpl(new LokalnoSkladiste());
+    }
+
     private String rootDirectoryPath;
     private int brojac = 0;
     private int brojac1 = 0;
