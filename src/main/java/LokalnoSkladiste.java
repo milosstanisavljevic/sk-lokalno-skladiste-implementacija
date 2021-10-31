@@ -21,8 +21,18 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
+    public void addUser(String path, String name, String password, int privilege) throws Exception {
+        super.addUser(path, name, password, privilege);
+    }
+
+    @Override
     public void makeDefaultConfig(String path) {
         super.makeDefaultConfig(path);
+    }
+
+    @Override
+    public void updateConfig(String path, Object size, Object filetype, Object maxNumber) throws Exception {
+        super.updateConfig(path, size, filetype, maxNumber);
     }
 
     @Override
