@@ -10,7 +10,8 @@ import java.util.Map;
 public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     private String rootDirectoryPath;
-    private static int brojac;
+    private int brojac = 0;
+    private int brojac1 = 0;
 
 
 
@@ -40,6 +41,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         super.makeDefaultUser(path);
     }
 
+    @Override
     public void createRoot(String path, String name){
         path = path + '\\' + name;
         File root = new File(path);
@@ -56,6 +58,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         }else
             System.out.println("Error!");
     }
+
+    @Override
     public void checkIfRootExists(String path){
         File f = new File(path);
         if(f.exists()){
@@ -64,6 +68,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             createRoot(path,"newRoot");
         }
     }
+
+    @Override
     public void createFile(String fileName){
         String p = getRootDirectoryPath() + "\\" + fileName;
         File f  = new File(p);
@@ -73,10 +79,45 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void createMoreFiles(int n) {
+        for (int i = 0; i<n; i++){
+            createFile("myFile" + brojac++);
+        }
+    }
+
+    @Override
+    public void createMoreFolders(int n) {
+        for (int i = 0; i<n; i++){
+            createFolder("myFolder" + brojac1++);
+        }
+    }
+
+    @Override
     public void createFolder(String folderName){
         String p = getRootDirectoryPath() + "\\" +folderName;
         File f = new File(p);
         f.mkdir();
+    }
+
+    @Override
+    public void deleteFile(String name) {
+        try {
+            File f = new File(rootDirectoryPath + "\\" + name);
+            if(f.delete()){
+                System.out.println(name + "deleted");
+            }else{
+                System.out.println("File was not deleted");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteFolder(String s) {
+
     }
 
     public String getRootDirectoryPath() {
