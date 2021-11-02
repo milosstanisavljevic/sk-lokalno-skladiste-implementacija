@@ -14,6 +14,10 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     private int brojac1 = 0;
 
 
+    @Override
+    public boolean checkUser(String path, String username1, String password1) {
+        return super.checkUser(path, username1, password1);
+    }
 
     public LokalnoSkladiste() {
     }
@@ -27,8 +31,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void makeDefaultConfig(String path) {
-        super.makeDefaultConfig(path);
+    public void makeDefaultConfig(String path, String username) {
+        super.makeDefaultConfig(path, username);
     }
 
     @Override
@@ -37,21 +41,19 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void makeDefaultUser(String path) {
-        super.makeDefaultUser(path);
+    public void makeDefaultUser(String path, String username, String password) {
+        super.makeDefaultUser(path, username, password);
     }
 
     @Override
-    public boolean createRoot(String path, String name){
-        path = path + '\\' + name;
+    public boolean createRoot(String path, String username, String password){
         File root = new File(path);
         setRootDirectoryPath(path);
         boolean b = root.mkdir();
         if(b){
             try {
-                makeDefaultConfig(path);
-                makeDefaultUser(path);
-                createFile("probica.txt");
+                makeDefaultConfig(path, username);
+                makeDefaultUser(path, username, password);
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -63,8 +65,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public boolean checkIfRootExists(String path, String name){
-        File f = new File(path + "\\" + name);
+    public boolean checkIfRootExists(String path){
+        File f = new File(path);
         if(f.exists()){
             return true;
         }else{
