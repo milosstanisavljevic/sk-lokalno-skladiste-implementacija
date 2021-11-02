@@ -1,10 +1,6 @@
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class LokalnoSkladiste extends SpecifikacijaSkladista{
@@ -46,7 +42,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void createRoot(String path, String name){
+    public boolean createRoot(String path, String name){
         path = path + '\\' + name;
         File root = new File(path);
         setRootDirectoryPath(path);
@@ -56,20 +52,23 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
                 makeDefaultConfig(path);
                 makeDefaultUser(path);
                 createFile("probica.txt");
+                return true;
             } catch (Exception e) {
                 e.printStackTrace();
+                return false;
             }
         }else
             System.out.println("Error!");
+            return false;
     }
 
     @Override
-    public void checkIfRootExists(String path){
-        File f = new File(path);
+    public boolean checkIfRootExists(String path, String name){
+        File f = new File(path + "\\" + name);
         if(f.exists()){
-            System.out.println("Root is already created");
+            return true;
         }else{
-            createRoot(path,"newRoot");
+            return false;
         }
     }
 
