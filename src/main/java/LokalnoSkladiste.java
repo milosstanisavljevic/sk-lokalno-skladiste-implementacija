@@ -36,7 +36,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void updateConfig(String path, Object size, Object filetype, Object maxNumber) throws Exception {
+    public void updateConfig(String path, int size, String filetype, int maxNumber) throws Exception {
         super.updateConfig(path, size, filetype, maxNumber);
     }
 
@@ -122,6 +122,11 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     @Override
     public void deleteFolder(String s) {
+
+    }
+
+    @Override
+    public void loadUsers() {
 
     }
 
