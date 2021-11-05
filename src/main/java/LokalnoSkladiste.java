@@ -50,6 +50,30 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
+    public Object checkConfigType(String path, String key) {
+        try {
+            String value = "";
+            path += "\\config.json";
+
+            Gson gson = new Gson();
+            Reader reader = Files.newBufferedReader(Paths.get(path));
+            Map<String, Object> map = gson.fromJson(reader, Map.class);
+
+            for (Map.Entry<String, Object> entry: map.entrySet()) {
+                if(entry.getKey().equalsIgnoreCase(key)){
+                    value += entry.getValue().toString();
+                }
+            }
+            reader.close();
+            return value;
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public boolean checkUser(String path, String username1, String password1) {
         try {
             String username2 = "";
@@ -111,8 +135,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void createFile(String fileName){
-        String p = getRootDirectoryPath() + "\\" + fileName;
+    public void createFile(String path, String fileName){
+        String p = path + "\\" + fileName;
         File f  = new File(p);
         try {
             f.createNewFile();
@@ -122,28 +146,28 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void createMoreFiles(int n) {
+    public void createMoreFiles(String path, int n) {
         for (int i = 0; i<n; i++){
-            createFile("myFile" + brojac++);
+            createFile(path, "myFile" + brojac++);
         }
     }
 
     @Override
-    public void createMoreFolders(int n) {
+    public void createMoreFolders(String path, int n) {
         for (int i = 0; i<n; i++){
-            createFolder("myFolder" + brojac1++);
+            createFolder(path, "Folder" + brojac1++);
         }
     }
 
     @Override
-    public void createFolder(String folderName){
-        String p = getRootDirectoryPath() + "\\" +folderName;
+    public void createFolder(String path, String folderName){
+        String p = path + "\\" +folderName;
         File f = new File(p);
         f.mkdir();
     }
 
     @Override
-    public void deleteFile(String name) {
+    public void deleteFile(String path, String name) {
         try {
             File f = new File(rootDirectoryPath + "\\" + name);
             if(f.delete()){
@@ -157,7 +181,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void deleteFolder(String s) {
+    public void deleteFolder(String path, String s) {
 
     }
 
