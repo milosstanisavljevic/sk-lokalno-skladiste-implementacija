@@ -206,9 +206,11 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     @Override
     public void makeUser(String path, List<Korisnik> korisnici) {
          try {
+             int i=0;
              Writer writer = new FileWriter(path);
              for (Korisnik k : korisnici) {
                  new Gson().toJson(k, writer);
+                 System.out.println(i++);
              }
              writer.close();
 
@@ -231,14 +233,14 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void addUser(String path, String name, String password, int privilege) {
+    public void addUser(String path, String name, String password, String privilege) {
         try {
-            if(privilege == 1){
+            if(privilege.equals("1")){
                 path = path + "\\" + "users.json";
                 List<Korisnik> korisnici = loadUsers(name, password, false, false, true, false);
                 makeUser(path, korisnici);
             }
-            if(privilege == 2){
+            if(privilege.equals("2")){
                 path = path + "\\" + "users.json";
                 List<Korisnik> korisnici = loadUsers(name, password, false, true, true, false);
                 makeUser(path, korisnici);
