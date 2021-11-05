@@ -1,6 +1,11 @@
 
-import java.io.File;
-import java.io.IOException;
+import com.google.gson.Gson;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 
 public class LokalnoSkladiste extends SpecifikacijaSkladista{
@@ -14,10 +19,6 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     private int brojac1 = 0;
 
 
-    @Override
-    public boolean checkUser(String path, String username1, String password1) {
-        return super.checkUser(path, username1, password1);
-    }
 
     public LokalnoSkladiste() {
     }
@@ -25,24 +26,59 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     public void checkPrivileges() {
     }
 
+
     @Override
-    public void addUser(String path, String name, String password, int privilege) throws Exception {
-        super.addUser(path, name, password, privilege);
+    public String checkAdmin(String path) {
+        try {
+            String admin = "";
+
+            Gson gson = new Gson();
+            Reader reader = Files.newBufferedReader(Paths.get(path));
+            Map<String, Object> map = gson.fromJson(reader, Map.class);
+
+            for (Map.Entry<String, Object> entry: map.entrySet()) {
+                if(entry.getKey().equalsIgnoreCase("admin")){
+                    admin += entry.getValue().toString();
+                }
+            }
+            reader.close();
+            return admin;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
-    public void makeDefaultConfig(String path, String username) {
-        super.makeDefaultConfig(path, username);
-    }
+    public boolean checkUser(String path, String username1, String password1) {
+        try {
+            String username2 = "";
+            String password2 = "";
+            path = path + "\\" + "users.json";
 
-    @Override
-    public void updateConfig(String path, int size, String filetype, int maxNumber) throws Exception {
-        super.updateConfig(path, size, filetype, maxNumber);
-    }
+            Gson gson = new Gson();
+            Reader reader = Files.newBufferedReader(Paths.get(path));
+            Map<String, Object> map = gson.fromJson(reader, Map.class);
 
-    @Override
-    public void makeDefaultUser(String path, String username, String password) {
-        super.makeDefaultUser(path, username, password);
+            for (Map.Entry<String, Object> entry: map.entrySet()) {
+                if(entry.getKey().equalsIgnoreCase("username")){
+                    username2 += entry.getValue().toString();
+                }
+                if(entry.getKey().equalsIgnoreCase("password")){
+                    password2+= entry.getValue().toString();
+                }
+            }
+            reader.close();
+
+            if(password1.equalsIgnoreCase(password2) && username1.equalsIgnoreCase(username2)) {
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
@@ -125,9 +161,91 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     }
 
-    @Override
-    public void loadUsers() {
 
+    @Override
+    public void makeConfig(String path, Map<String, Object> map){
+        try {
+            Writer writer = new FileWriter(path);
+            new Gson().toJson(map, writer);
+
+            writer.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Map<String, Object> mapConfig(Object size, String filetype, int maxNumber, String admin) {
+        return super.mapConfig(size, filetype, maxNumber, admin);
+    }
+
+    @Override
+    public void makeDefaultConfig(String path, String username) {
+        path = path + "\\" + "config.json";
+        try {
+            Map<String, Object> map = mapConfig(1000000, ".txt", 10, username);
+            makeConfig(path, map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateConfig(String path, int size, String filetype, int maxNumber) {
+            path = path + "\\" + "config.json";
+            String admin = checkAdmin(path);
+            Map<String, Object> map = mapConfig(size, filetype, maxNumber, admin);
+            makeConfig(path, map);
+    }
+
+    @Override
+    public List<Korisnik> loadUsers(String username, String password, boolean edit, boolean write, boolean read, boolean delete) {
+        return super.loadUsers(username, password, edit, write, read, delete);
+    }
+
+    @Override
+    public void makeUser(String path, List<Korisnik> korisnici) {
+         try {
+             Writer writer = new FileWriter(path);
+             for (Korisnik k : korisnici) {
+                 new Gson().toJson(k, writer);
+             }
+             writer.close();
+
+         }catch (Exception e){
+             e.printStackTrace();
+         }
+    }
+
+    @Override
+    public void makeDefaultUser(String path, String username, String password) {
+
+        path = path + "\\" + "users.json";
+
+        try {
+            List<Korisnik> korisnici = loadUsers(username, password, true, true, true, true);
+            makeUser(path, korisnici);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addUser(String path, String name, String password, int privilege) {
+        try {
+            if(privilege == 1){
+                path = path + "\\" + "users.json";
+                List<Korisnik> korisnici = loadUsers(name, password, false, false, true, false);
+                makeUser(path, korisnici);
+            }
+            if(privilege == 2){
+                path = path + "\\" + "users.json";
+                List<Korisnik> korisnici = loadUsers(name, password, false, true, true, false);
+                makeUser(path, korisnici);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public String getRootDirectoryPath() {
