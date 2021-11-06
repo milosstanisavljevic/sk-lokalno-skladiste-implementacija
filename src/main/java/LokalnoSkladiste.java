@@ -17,7 +17,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     private String rootDirectoryPath;
     private int brojac = 0;
     private int brojac1 = 0;
-
+    private int files = 0;
+    private int memory = 0;
 
 
     public LokalnoSkladiste() {
@@ -52,8 +53,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     @Override
     public Object checkConfigType(String path, String key) {
         try {
-            String value = "";
-            path += "\\config.json";
+            Object value = null;
+            path = rootDirectoryPath + "\\config.json";
 
             Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get(path));
@@ -61,7 +62,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
             for (Map.Entry<String, Object> entry: map.entrySet()) {
                 if(entry.getKey().equalsIgnoreCase(key)){
-                    value += entry.getValue().toString();
+                    value = entry.getValue();
                 }
             }
             reader.close();
@@ -77,28 +78,43 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     public boolean checkUser(String path, String username1, String password1) {
         try {
             String username2 = "";
+            boolean s1 = false;
             String password2 = "";
-            path = path + "\\" + "users.json";
+            boolean s2 = false;
+
+            setRootDirectoryPath(path);
+            path = rootDirectoryPath + "\\" + "users.json";
 
             Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get(path));
+
             Map<String, Object> map = gson.fromJson(reader, Map.class);
 
             for (Map.Entry<String, Object> entry: map.entrySet()) {
                 if(entry.getKey().equalsIgnoreCase("username")){
-                    username2 += entry.getValue().toString();
+                    if(entry.getValue().toString().equalsIgnoreCase(username1)) {
+                        username2 += entry.getValue().toString();
+                        System.out.println(username2);
+                        s1 = true;
+                    }
                 }
                 if(entry.getKey().equalsIgnoreCase("password")){
-                    password2+= entry.getValue().toString();
+                    if(entry.getValue().toString().equalsIgnoreCase(password1)) {
+                        password2 += entry.getValue().toString();
+                        System.out.println(password2);
+                        s2 = true;
+                    }
                 }
+                if(s1 == true && s2 == true){
+                    reader.close();
+                    return true;
+                }
+
             }
             reader.close();
 
-            if(password1.equalsIgnoreCase(password2) && username1.equalsIgnoreCase(username2)) {
-                return true;
-            }else{
-                return false;
-            }
+            return false;
+
         }catch (Exception e){
             e.printStackTrace();
             return false;
@@ -136,40 +152,61 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     @Override
     public void createFile(String path, String fileName){
-        String p = path + "\\" + fileName;
-        File f  = new File(p);
-        try {
-            f.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        files++;
+        setFiles(files);
+        double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+        if(i > files) {
+            String p = path + "\\" + fileName;
+            File f = new File(p);
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void createMoreFiles(String path, int n) {
-        for (int i = 0; i<n; i++){
-            createFile(path, "myFile" + brojac++);
+    public void createMoreFiles(String path, int n, String filetype) {
+        files+=n;
+        setFiles(files);
+        double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+        if(br > files) {
+            for (int i = 0; i < n; i++) {
+                createFile(path, "myFile" + brojac++ + filetype);
+            }
         }
     }
 
     @Override
     public void createMoreFolders(String path, int n) {
-        for (int i = 0; i<n; i++){
-            createFolder(path, "Folder" + brojac1++);
+        files+=n;
+        setFiles(files);
+        double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+        if(br > files) {
+            for (int i = 0; i < n; i++) {
+                createFolder(path, "Folder" + brojac1++ );
+            }
         }
     }
 
     @Override
     public void createFolder(String path, String folderName){
-        String p = path + "\\" +folderName;
-        File f = new File(p);
-        f.mkdir();
+        files++;
+        setFiles(files);
+        double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+        if(i > files) {
+            String p = path + "\\" + folderName;
+            File f = new File(p);
+            f.mkdir();
+        }
     }
 
     @Override
     public void deleteFile(String path, String name) {
+        //proveravanje privilegije
         try {
-            File f = new File(rootDirectoryPath + "\\" + name);
+            File f = new File(path + "\\" + name);
             if(f.delete()){
                 System.out.println(name + "deleted");
             }else{
@@ -181,8 +218,20 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void deleteFolder(String path, String s) {
+    public void deleteFolder(String path, String name) {
+        //proveravanje privilegije
 
+        File file = new File(path + "\\" + name);
+        String[] files = file.list();
+        if(files.length > 0) {
+            for (String s : files) {
+                File currentFile = new File(file.getPath(), s);
+                currentFile.delete();
+            }
+        }else{
+            file.delete();
+        }
+        file.delete();
     }
 
 
@@ -280,5 +329,15 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     public void setRootDirectoryPath(String rootDirectoryPath) {
         this.rootDirectoryPath = rootDirectoryPath;
+    }
+
+    @Override
+    public void setMemory(int memory) {
+        this.memory = memory;
+    }
+
+    @Override
+    public void setFiles(int files) {
+        this.files = files;
     }
 }
