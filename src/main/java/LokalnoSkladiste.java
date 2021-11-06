@@ -254,7 +254,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     @Override
     public void makeDefaultConfig(String path, String username) {
-        path = path + "\\" + "config.json";
+        path = rootDirectoryPath + "\\" + "config.json";
         try {
             Map<String, Object> map = mapConfig(1000000, ".txt", 10, username);
             makeConfig(path, map);
@@ -265,7 +265,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     @Override
     public void updateConfig(String path, int size, String filetype, int maxNumber) {
-            path = path + "\\" + "config.json";
+            path = rootDirectoryPath + "\\" + "config.json";
             String admin = checkAdmin(path);
             Map<String, Object> map = mapConfig(size, filetype, maxNumber, admin);
             makeConfig(path, map);
@@ -295,7 +295,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     @Override
     public void makeDefaultUser(String path, String username, String password) {
 
-        path = path + "\\" + "users.json";
+        path = rootDirectoryPath + "\\" + "users.json";
 
         try {
             List<Korisnik> korisnici = loadUsers(username, password, true, true, true, true);
@@ -309,12 +309,12 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     public void addUser(String path, String name, String password, String privilege) {
         try {
             if(privilege.equals("1")){
-                path = path + "\\" + "users.json";
+                path = rootDirectoryPath + "\\" + "users.json";
                 List<Korisnik> korisnici = loadUsers(name, password, false, false, true, false);
                 makeUser(path, korisnici);
             }
             if(privilege.equals("2")){
-                path = path + "\\" + "users.json";
+                path = rootDirectoryPath + "\\" + "users.json";
                 List<Korisnik> korisnici = loadUsers(name, password, false, true, true, false);
                 makeUser(path, korisnici);
             }
