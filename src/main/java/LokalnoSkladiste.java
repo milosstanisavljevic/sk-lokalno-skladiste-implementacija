@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 
@@ -232,6 +233,30 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             file.delete();
         }
         file.delete();
+    }
+
+    @Override
+    public void moveFromTo(String fromFolder, String toFolder, String file) {
+
+        fromFolder = rootDirectoryPath + "\\" + fromFolder;
+        System.out.println(fromFolder);
+        toFolder = rootDirectoryPath + "\\" + toFolder;
+        System.out.println(toFolder);
+
+        File fileToMove = new File(fromFolder + "\\" + file);
+        System.out.println(fileToMove);
+
+        //fileToMove.renameTo(new File(toFolder));
+
+        try {
+
+            Files.move(Paths.get(fromFolder  + "\\" + file), Paths.get(toFolder ), StandardCopyOption.ATOMIC_MOVE);
+
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+
     }
 
 
