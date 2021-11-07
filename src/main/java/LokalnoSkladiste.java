@@ -249,8 +249,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         //fileToMove.renameTo(new File(toFolder));
 
         try {
-
-            Files.move(Paths.get(fromFolder  + "\\" + file), Paths.get(toFolder ), StandardCopyOption.ATOMIC_MOVE);
+            //createFile(toFolder, file);
+            Files.move(Paths.get(fromFolder  + "\\" + file), Paths.get(toFolder + "\\" + file), StandardCopyOption.REPLACE_EXISTING);
 
         } catch (IOException ioException) {
             ioException.printStackTrace();
