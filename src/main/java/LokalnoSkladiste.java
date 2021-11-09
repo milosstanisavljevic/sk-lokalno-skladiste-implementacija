@@ -3,10 +3,12 @@ import com.google.gson.Gson;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 
 public class LokalnoSkladiste extends SpecifikacijaSkladista{
@@ -95,14 +97,12 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
                 if(entry.getKey().equalsIgnoreCase("username")){
                     if(entry.getValue().toString().equalsIgnoreCase(username1)) {
                         username2 += entry.getValue().toString();
-                        System.out.println(username2);
                         s1 = true;
                     }
                 }
                 if(entry.getKey().equalsIgnoreCase("password")){
                     if(entry.getValue().toString().equalsIgnoreCase(password1)) {
                         password2 += entry.getValue().toString();
-                        System.out.println(password2);
                         s2 = true;
                     }
                 }
@@ -137,7 +137,6 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
                 return false;
             }
         }else
-            System.out.println("Error!");
             return false;
     }
 
@@ -153,10 +152,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     @Override
     public void createFile(String path, String fileName){
-        files++;
-        setFiles(files);
+        int fs = countFiles();
         double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-        if(i > files) {
+        if(i > fs) {
             String p = path + "\\" + fileName;
             File f = new File(p);
             try {
@@ -169,10 +167,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     @Override
     public void createMoreFiles(String path, int n, String filetype) {
-        files+=n;
-        setFiles(files);
+        int fs = countFiles();
         double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-        if(br > files) {
+        if(br > fs) {
             for (int i = 0; i < n; i++) {
                 createFile(path, "myFile" + brojac++ + filetype);
             }
@@ -181,10 +178,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     @Override
     public void createMoreFolders(String path, int n) {
-        files+=n;
-        setFiles(files);
+        int fs = countFiles();
         double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-        if(br > files) {
+        if(br > fs) {
             for (int i = 0; i < n; i++) {
                 createFolder(path, "Folder" + brojac1++ );
             }
@@ -193,10 +189,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 
     @Override
     public void createFolder(String path, String folderName){
-        files++;
-        setFiles(files);
+        int fs = countFiles();
         double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-        if(i > files) {
+        if(i > fs) {
             String p = path + "\\" + folderName;
             File f = new File(p);
             f.mkdir();
@@ -208,11 +203,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         //proveravanje privilegije
         try {
             File f = new File(path + "\\" + name);
-            if(f.delete()){
-                System.out.println(name + "deleted");
-            }else{
-                System.out.println("File was not deleted");
-            }
+            f.delete();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -239,17 +230,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     public void moveFromTo(String fromFolder, String toFolder, String file) {
 
         fromFolder = rootDirectoryPath + "\\" + fromFolder;
-        System.out.println(fromFolder);
         toFolder = rootDirectoryPath + "\\" + toFolder;
-        System.out.println(toFolder);
-
-        File fileToMove = new File(fromFolder + "\\" + file);
-        System.out.println(fileToMove);
-
-        //fileToMove.renameTo(new File(toFolder));
 
         try {
-            //createFile(toFolder, file);
             Files.move(Paths.get(fromFolder  + "\\" + file), Paths.get(toFolder + "\\" + file), StandardCopyOption.REPLACE_EXISTING);
 
         } catch (IOException ioException) {
@@ -257,6 +240,28 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         }
 
 
+    }
+
+    @Override
+    public void downloadFile(String path) {
+
+        try {
+            Files.move(Paths.get(path), Paths.get("C:\\Users\\milja\\Downloads"), StandardCopyOption.REPLACE_EXISTING);
+
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    @Override
+    public int countFiles() {
+        try (Stream<Path> files = Files.list(Paths.get(rootDirectoryPath))) {
+            int count = (int) files.count();
+            return count;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 
@@ -308,7 +313,6 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
              Writer writer = new FileWriter(path);
              for (Korisnik k : korisnici) {
                  new Gson().toJson(k, writer);
-                 System.out.println(i++);
              }
              writer.close();
 
