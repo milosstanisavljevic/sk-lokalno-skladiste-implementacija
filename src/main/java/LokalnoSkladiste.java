@@ -80,6 +80,116 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         }
     }
 
+//    @Override
+//    public boolean checkUser(String path, String username1, String password1) {
+//        try {
+//            String username2 = "";
+//            boolean f1 = false;
+//            String password2 = "";
+//            boolean f2 = false;
+//            boolean f3 = false;
+//            boolean f4 = false;
+//
+//            setRootDirectoryPath(path);
+//            path = rootDirectoryPath + "\\" + "users.json";
+//
+//            File f = new File(String.valueOf(Paths.get(path)));
+//
+//            Gson gson = new Gson();
+//            Reader reader = Files.newBufferedReader(Paths.get(path));
+//            InputStream is = new FileInputStream(f);
+//            Reader r = new InputStreamReader(is, "UTF-8");
+//            Gson gson1 = new GsonBuilder().create();
+//            JsonStreamParser p = new JsonStreamParser(r);
+//
+//            while (p.hasNext()) {
+//                JsonElement e = p.next();
+//                if (e.isJsonObject()) {
+//                    Map<String, Object> map = gson1.fromJson(e, Map.class);
+//                    for (Map.Entry<String, Object> entry: map.entrySet()) {
+//                            if(entry.getKey().equalsIgnoreCase("username")){
+//                                if(entry.getValue().toString().equalsIgnoreCase(username1)) {
+//                                    username2 += entry.getValue().toString();
+//                                    System.out.println(entry.getValue().toString());
+//                                }
+//                            }
+//                            if(entry.getKey().equalsIgnoreCase("password")){
+//                                if(entry.getValue().toString().equalsIgnoreCase(password1)) {
+//                                    password2 += entry.getValue().toString();
+//                                    System.out.println(entry.getValue().toString());
+//                                }
+//                            }
+//                            if(entry.getKey().equalsIgnoreCase("read")){
+//                                if((boolean) entry.getValue()) {
+//                                    username2 += entry.getValue().toString();
+//                                    System.out.println(entry.getValue().toString());
+//                                    f1 = true;
+//                                }
+//                            }
+//                            if(entry.getKey().equalsIgnoreCase("write")){
+//                                if((boolean) entry.getValue()) {
+//                                    password2 += entry.getValue().toString();
+//                                    System.out.println(entry.getValue().toString());
+//                                    f2 = true;
+//                                }
+//                            }
+//                            if(entry.getKey().equalsIgnoreCase("edit")){
+//                                if((boolean) entry.getValue()) {
+//                                    password2 += entry.getValue().toString();
+//                                    System.out.println(entry.getValue().toString());
+//                                    f3 = true;
+//                                }
+//                            }
+//                            if(entry.getKey().equalsIgnoreCase("delete")){
+//                                if((boolean) entry.getValue()) {
+//                                    password2 += entry.getValue().toString();
+//                                    System.out.println(entry.getValue().toString());
+//                                    f4 = true;
+//                                }
+//                            }
+//
+//                            if(f1 && f2 && f3 && f4){
+//                                reader.close();
+//                                return true;
+//                            }else{
+//                                break;
+//                            }
+//
+//                        }
+//                    }
+//                  }
+////            Map<String, Object> map = gson.fromJson(reader, Map.class); //CITA SAMO JEDAN OBJEKAT, NAMA TREBA DA CITA VISE
+////
+////            for (Map.Entry<String, Object> entry: map.entrySet()) {
+////                if(entry.getKey().equalsIgnoreCase("username")){
+////                    if(entry.getValue().toString().equalsIgnoreCase(username1)) {
+////                        username2 += entry.getValue().toString();
+////                        s1 = true;
+////                    }
+////                }
+////                if(entry.getKey().equalsIgnoreCase("password")){
+////                    if(entry.getValue().toString().equalsIgnoreCase(password1)) {
+////                        password2 += entry.getValue().toString();
+////                        s2 = true;
+////                    }
+////                }
+////                if(s1 == true && s2 == true){
+////                    reader.close();
+////                    return true;
+////                }
+////
+////            }
+//            reader.close();
+//
+//            return false;
+//
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
+
+
     @Override
     public boolean checkUser(String path, String username1, String password1) {
         try {
@@ -87,40 +197,23 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             boolean s1 = false;
             String password2 = "";
             boolean s2 = false;
-
             setRootDirectoryPath(path);
             path = rootDirectoryPath + "\\" + "users.json";
-
-                    Gson gson = new Gson();
+            Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get(path));
-            InputStream is = new FileInputStream("proba");
-                   Reader r = new InputStreamReader(is, "UTF-8");
-                   Gson gson1 = new GsonBuilder().create();
-                  JsonStreamParser p = new JsonStreamParser(r);
-
-                 while (p.hasNext()) {
-                      JsonElement e = p.next();
-                      if (e.isJsonObject()) {
-                          Map m = gson1.fromJson(e, Map.class);
-                          /* do something useful with JSON object .. */
-//                          for(Map.Entry<String,Object> entry : m.entrySet()){
-//
-//                          }
-                      }
-            //          /* handle other JSON data structures */
-                  }
-            Map<String, Object> map = gson.fromJson(reader, Map.class); //CITA SAMO JEDAN OBJEKAT, NAMA TREBA DA CITA VISE
-
+            Map<String, Object> map = gson.fromJson(reader, Map.class);
             for (Map.Entry<String, Object> entry: map.entrySet()) {
                 if(entry.getKey().equalsIgnoreCase("username")){
                     if(entry.getValue().toString().equalsIgnoreCase(username1)) {
                         username2 += entry.getValue().toString();
+                        System.out.println(username2);
                         s1 = true;
                     }
                 }
                 if(entry.getKey().equalsIgnoreCase("password")){
                     if(entry.getValue().toString().equalsIgnoreCase(password1)) {
                         password2 += entry.getValue().toString();
+                        System.out.println(password2);
                         s2 = true;
                     }
                 }
@@ -128,17 +221,25 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
                     reader.close();
                     return true;
                 }
-
             }
             reader.close();
-
             return false;
-
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
     }
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public boolean createRoot(String path, String username, String password){
