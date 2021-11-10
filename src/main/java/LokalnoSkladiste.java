@@ -1,5 +1,8 @@
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonStreamParser;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -88,9 +91,24 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             setRootDirectoryPath(path);
             path = rootDirectoryPath + "\\" + "users.json";
 
-            Gson gson = new Gson();
+                    Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get(path));
+            InputStream is = new FileInputStream("proba");
+                   Reader r = new InputStreamReader(is, "UTF-8");
+                   Gson gson1 = new GsonBuilder().create();
+                  JsonStreamParser p = new JsonStreamParser(r);
 
+                 while (p.hasNext()) {
+                      JsonElement e = p.next();
+                      if (e.isJsonObject()) {
+                          Map m = gson1.fromJson(e, Map.class);
+                          /* do something useful with JSON object .. */
+//                          for(Map.Entry<String,Object> entry : m.entrySet()){
+//
+//                          }
+                      }
+            //          /* handle other JSON data structures */
+                  }
             Map<String, Object> map = gson.fromJson(reader, Map.class); //CITA SAMO JEDAN OBJEKAT, NAMA TREBA DA CITA VISE
 
             for (Map.Entry<String, Object> entry: map.entrySet()) {
