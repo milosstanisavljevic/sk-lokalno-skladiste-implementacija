@@ -91,7 +91,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get(path));
 
-            Map<String, Object> map = gson.fromJson(reader, Map.class);
+            Map<String, Object> map = gson.fromJson(reader, Map.class); //CITA SAMO JEDAN OBJEKAT, NAMA TREBA DA CITA VISE
 
             for (Map.Entry<String, Object> entry: map.entrySet()) {
                 if(entry.getKey().equalsIgnoreCase("username")){
