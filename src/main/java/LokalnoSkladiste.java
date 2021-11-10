@@ -197,8 +197,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             boolean s1 = false;
             String password2 = "";
             boolean s2 = false;
-            setRootDirectoryPath(path);
-            path = rootDirectoryPath + "\\" + "users.json";
+            path = path + "\\" + "users.json";
             Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get(path));
             Map<String, Object> map = gson.fromJson(reader, Map.class);
@@ -217,8 +216,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
                         s2 = true;
                     }
                 }
-                if(s1 == true && s2 == true){
+                if(s1 && s2){
                     reader.close();
+                    setRootDirectoryPath(path);
                     return true;
                 }
             }
@@ -393,6 +393,10 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         return 0;
     }
 
+    @Override
+    public String[] listFiles(String path) {
+        return super.listFiles(path);
+    }
 
     @Override
     public void makeConfig(String path, Map<String, Object> map){
