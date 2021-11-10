@@ -227,13 +227,10 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void moveFromTo(String fromFolder, String toFolder, String file) {
-
-        fromFolder = rootDirectoryPath + "\\" + fromFolder;
-        toFolder = rootDirectoryPath + "\\" + toFolder;
+    public void moveFromTo(String fromPath, String toPath, String file) {
 
         try {
-            Files.move(Paths.get(fromFolder  + "\\" + file), Paths.get(toFolder + "\\" + file), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(Paths.get(fromPath + "\\" + file), Paths.get(toPath + "\\" + file), StandardCopyOption.REPLACE_EXISTING);
 
         } catch (IOException ioException) {
             ioException.printStackTrace();
@@ -243,13 +240,26 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     }
 
     @Override
-    public void downloadFile(String path) {
+    public void downloadFile(String path, String filename) {
 
         try {
-            Files.move(Paths.get(path), Paths.get("C:\\Users\\milja\\Downloads"), StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(Paths.get(path + "\\" + filename), Paths.get("C:\\Users\\milja\\Downloads\\" + filename), StandardCopyOption.COPY_ATTRIBUTES);
 
         } catch (IOException ioException) {
             ioException.printStackTrace();
+        }
+    }
+
+    @Override
+    public void copyPasteFiles(String fromFolder, String toFolder, String filename) {
+
+        try{
+
+            Files.copy(Paths.get(fromFolder  + "\\" + filename), Paths.get(toFolder + "\\" + filename), StandardCopyOption.COPY_ATTRIBUTES);
+
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 
