@@ -3,18 +3,24 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonStreamParser;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 
-public class LokalnoSkladiste extends SpecifikacijaSkladista{
+public class LokalnoSkladiste extends SpecifikacijaSkladista {
 
     static {
         Manager.registerImpl(new LokalnoSkladiste());
@@ -33,7 +39,6 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
     public void checkPrivileges() {
     }
 
-
     @Override
     public String checkAdmin(String path) {
         try {
@@ -43,14 +48,14 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             Reader reader = Files.newBufferedReader(Paths.get(path));
             Map<String, Object> map = gson.fromJson(reader, Map.class);
 
-            for (Map.Entry<String, Object> entry: map.entrySet()) {
-                if(entry.getKey().equalsIgnoreCase("admin")){
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                if (entry.getKey().equalsIgnoreCase("admin")) {
                     admin += entry.getValue().toString();
                 }
             }
             reader.close();
             return admin;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -66,15 +71,15 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
             Reader reader = Files.newBufferedReader(Paths.get(path));
             Map<String, Object> map = gson.fromJson(reader, Map.class);
 
-            for (Map.Entry<String, Object> entry: map.entrySet()) {
-                if(entry.getKey().equalsIgnoreCase(key)){
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                if (entry.getKey().equalsIgnoreCase(key)) {
                     value = entry.getValue();
                 }
             }
             reader.close();
             return value;
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -189,54 +194,110 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
 //        }
 //    }
 
-
+    ////private static final Type REVIEW_TYPE = new TypeToken<List<Review>>() {
+////}.getType();
+////Gson gson = new Gson();
+////JsonReader reader = new JsonReader(new FileReader(filename));
+////List<Review> data = gson.fromJson(reader, REVIEW_TYPE); // contains the whole reviews list
+////data.toScreen(); // prints to screen some value
+//    //Review[] data = gson.fromJson(reader, Review[].class);
     @Override
     public boolean checkUser(String path, String username1, String password1) {
+//        System.out.println("RIFRESH");
+//        try {
+//            File file = new File(path + "\\users.json");
+//            BufferedReader reader = new BufferedReader(new FileReader(file));
+//            String line;
+//            Gson gson = new Gson();
+//            Type type = new TypeToken<List<Korisnik>>(){}.getType();
+//            while ((line = reader.readLine()) != null){
+//                this.getKorisnici().addAll((Collection<? extends Korisnik>) gson.fromJson(line,type));
+//            }
+//            System.out.println("refreshed44");
+//            System.out.println(getKorisnici() + "ILI JESI ILI NISI lav");
+//            reader.close();
+//            setRootDirectoryPath(path);
+//            return true;
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//
+//        return false;
+//        System.out.println("DAL JE OVDE UCLO");
+        System.out.println("refreshed2");
+        Type type = new TypeToken<Korisnik[]>() {
+        }.getType();
         try {
             String username2 = "";
             boolean s1 = false;
             String password2 = "";
             boolean s2 = false;
+            boolean s3 = false;
+            boolean s4 = false;
             path = path + "\\" + "users.json";
             Gson gson = new Gson();
-            Reader reader = Files.newBufferedReader(Paths.get(path));
-            Map<String, Object> map = gson.fromJson(reader, Map.class);
-            for (Map.Entry<String, Object> entry: map.entrySet()) {
-                if(entry.getKey().equalsIgnoreCase("username")){
-                    if(entry.getValue().toString().equalsIgnoreCase(username1)) {
-                        username2 += entry.getValue().toString();
-                        System.out.println(username2);
-                        s1 = true;
-                    }
+            JsonReader reader = new JsonReader(new FileReader(path));
+            Korisnik[] data = gson.fromJson(reader, type);
+            System.out.println(data + "BBBBBBBBBBB");
+            for (Korisnik k : data) {
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                if (k.getUsername().equalsIgnoreCase(username1)) {
+                    username2 += k.getUsername();
                 }
-                if(entry.getKey().equalsIgnoreCase("password")){
-                    if(entry.getValue().toString().equalsIgnoreCase(password1)) {
-                        password2 += entry.getValue().toString();
-                        System.out.println(password2);
-                        s2 = true;
-                    }
+                if (k.getPassword().equalsIgnoreCase(password1)) {
+                    password2 += k.getPassword();
                 }
-                if(s1 && s2){
-                    reader.close();
+                if (k.isRead()) {
+                    s1 = true;
+                }//read write edit delete
+                if (k.isWrite()) {
+                    s2 = true;
+                }
+                if (k.isEdit()) {
+                    s3 = true;
+                }
+                if (k.isDelete()) {
+                    s4 = true;
+                }
+                if (s1 && s2 && s3 && s4 && username2.equalsIgnoreCase(username1) && password2.equalsIgnoreCase(password1)) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     setRootDirectoryPath(path);
                     return true;
-                }
+                } else return false;
             }
-            reader.close();
-            return false;
-        }catch (Exception e){
+//            for (Map.Entry<String, Object> entry: map.entrySet()) {
+//                if(entry.getKey().equalsIgnoreCase("username")){
+//                    if(entry.getValue().toString().equalsIgnoreCase(username1)) {
+//                        username2 += entry.getValue().toString();
+//                        System.out.println(username2);
+//                        s1 = true;
+//                    }
+//                }
+//                if(entry.getKey().equalsIgnoreCase("password")){
+//                    if(entry.getValue().toString().equalsIgnoreCase(password1)) {
+//                        password2 += entry.getValue().toString();
+//                        System.out.println(password2);
+//                        s2 = true;
+//                    }
+//                }
+//                if(s1 && s2){
+//                    reader.close();
+//                    setRootDirectoryPath(path);
+//                    return true;
+//                }
+//            }
+//            reader.close();
+//            return false;
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+        return false;
     }
-
-
-
-
-
-
-
-
 
 
 
@@ -284,27 +345,48 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
         }
     }
 
+
+    //    @Override
+//    public void createMoreFiles(String path, int n, String filetype) {
+//        int fs = countFiles();
+//        double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+//        if(br > fs) {
+//            for (int i = 0; i < n; i++) {
+//                createFile(path, "myFile" + brojac++ + filetype);
+//            }
+//        }
+//    }
     @Override
     public void createMoreFiles(String path, int n, String filetype) {
         int fs = countFiles();
-        double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-        if(br > fs) {
-            for (int i = 0; i < n; i++) {
-                createFile(path, "myFile" + brojac++ + filetype);
-            }
+        double br =Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+        if(br>fs) {
+            super.createMoreFiles(path, n, filetype);
         }
     }
 
     @Override
     public void createMoreFolders(String path, int n) {
         int fs = countFiles();
-        double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-        if(br > fs) {
-            for (int i = 0; i < n; i++) {
-                createFolder(path, "Folder" + brojac1++ );
-            }
+        double br = Double.parseDouble(checkConfigType(path,"maxNumber").toString());
+        if (br>fs) {
+            super.createMoreFolders(path, n);
         }
     }
+    /**Proveriiti da li ovo sme*/
+
+
+    //    @Override
+//    public void createMoreFolders(String path, int n) {
+//        super.createMoreFolders(path,n);
+//        int fs = countFiles();
+//        double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+//        if(br > fs) {
+//            for (int i = 0; i < n; i++) {
+//                createFolder(path, "Folder" + brojac1++ );
+//            }
+//        }
+//    }
 
     @Override
     public void createFolder(String path, String folderName){
@@ -444,9 +526,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista{
          try {
              int i=0;
              Writer writer = new FileWriter(path);
-             for (Korisnik k : korisnici) {
-                 new Gson().toJson(k, writer);
-             }
+             new Gson().toJson(korisnici,writer);
              writer.close();
 
          }catch (Exception e){
