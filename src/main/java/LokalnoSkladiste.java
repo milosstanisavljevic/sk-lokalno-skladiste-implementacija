@@ -27,6 +27,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     }
 
     private String rootDirectoryPath;
+    private String connectedUser;
     private int brojac = 0;
     private int brojac1 = 0;
     private int files = 0;
@@ -36,7 +37,41 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     public LokalnoSkladiste() {
     }
 
-    public void checkPrivileges() {
+    @Override
+    public boolean checkPrivileges(String privilege) {
+
+        try {
+            String path = rootDirectoryPath + "\\" + "users.json";
+            Type type = new TypeToken<Korisnik[]>() {
+            }.getType();
+            Gson gson = new Gson();
+            JsonReader reader = new JsonReader(new FileReader(path));
+            Korisnik[] data = gson.fromJson(reader, type);
+
+            for (Korisnik k : data) {
+                if(k.getUsername().equalsIgnoreCase(connectedUser)) {
+                    switch (privilege) {
+
+                        case ("read"):
+                            return k.isRead();
+
+                        case ("write"):
+                            return k.isWrite();
+
+                        case ("delete"):
+                            return k.isDelete();
+
+                        case ("edit"):
+                            return k.isEdit();
+
+                    }
+                }
+            }
+            return false;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -119,8 +154,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
 
                 if (s1 && s2) {
                     reader.close();
+                    connectedUser = k.getUsername();
                     return true;
-                } else return false;
+                }
             }
 
         } catch (Exception e) {
@@ -160,6 +196,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
 
     @Override
     public void createFile(String path, String fileName){
+
         int fs = countFiles();
         double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
         if(i > fs) {
@@ -173,17 +210,6 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
         }
     }
 
-
-    //    @Override
-//    public void createMoreFiles(String path, int n, String filetype) {
-//        int fs = countFiles();
-//        double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-//        if(br > fs) {
-//            for (int i = 0; i < n; i++) {
-//                createFile(path, "myFile" + brojac++ + filetype);
-//            }
-//        }
-//    }
     @Override
     public void createMoreFiles(String path, int n, String filetype) {
         int fs = countFiles();
@@ -202,19 +228,6 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
         }
     }
     /**Proveriiti da li ovo sme*/
-
-
-    //    @Override
-//    public void createMoreFolders(String path, int n) {
-//        super.createMoreFolders(path,n);
-//        int fs = countFiles();
-//        double br = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-//        if(br > fs) {
-//            for (int i = 0; i < n; i++) {
-//                createFolder(path, "Folder" + brojac1++ );
-//            }
-//        }
-//    }
 
     @Override
     public void createFolder(String path, String folderName){
@@ -329,7 +342,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     public void makeDefaultConfig(String path, String username) {
         path = rootDirectoryPath + "\\" + "config.json";
         try {
-            Map<String, Object> map = mapConfig(1000000, ".txt", 10, username);
+            Map<String, Object> map = mapConfig(1000000, ".json", 10, username);
             makeConfig(path, map);
         } catch (Exception e) {
             e.printStackTrace();
@@ -337,11 +350,17 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     }
 
     @Override
-    public void updateConfig(String path, int size, String filetype, int maxNumber) {
-            path = rootDirectoryPath + "\\" + "config.json";
-            String admin = checkAdmin(path);
-            Map<String, Object> map = mapConfig(size, filetype, maxNumber, admin);
-            makeConfig(path, map);
+    public boolean updateConfig(String path, int size, String filetype, int maxNumber) {
+
+            if(checkPrivileges("read") && checkPrivileges("write") && checkPrivileges("edit") && checkPrivileges("delete")) {
+                path = rootDirectoryPath + "\\" + "config.json";
+                String admin = checkAdmin(path);
+                Map<String, Object> map = mapConfig(size, filetype, maxNumber, admin);
+                makeConfig(path, map);
+                return true;
+            }else{
+                return false;
+            }
     }
 
     @Override
@@ -376,21 +395,25 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     }
 
     @Override
-    public void addUser(String path, String name, String password, String privilege) {
-        try {
-            if(privilege.equals("1")){
-                path = rootDirectoryPath + "\\" + "users.json";
-                List<Korisnik> korisnici = loadUsers(name, password, false, false, true, false);
-                makeUser(path, korisnici);
+    public boolean addUser(String path, String name, String password, String privilege) {
+
+        if(checkPrivileges("read") && checkPrivileges("write") && checkPrivileges("edit") && checkPrivileges("delete")) {
+            try {
+                if (privilege.equals("1")) {
+                    path = rootDirectoryPath + "\\" + "users.json";
+                    List<Korisnik> korisnici = loadUsers(name, password, false, false, true, false);
+                    makeUser(path, korisnici);
+                }
+                if (privilege.equals("2")) {
+                    path = rootDirectoryPath + "\\" + "users.json";
+                    List<Korisnik> korisnici = loadUsers(name, password, false, true, true, false);
+                    makeUser(path, korisnici);
+                }
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            if(privilege.equals("2")){
-                path = rootDirectoryPath + "\\" + "users.json";
-                List<Korisnik> korisnici = loadUsers(name, password, false, true, true, false);
-                makeUser(path, korisnici);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        } return false;
     }
 
     public String getRootDirectoryPath() {
