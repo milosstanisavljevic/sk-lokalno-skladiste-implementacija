@@ -53,15 +53,19 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
                     switch (privilege) {
 
                         case ("read"):
+                            System.out.println(k.isRead());
                             return k.isRead();
 
                         case ("write"):
+                            System.out.println(k.isWrite());
                             return k.isWrite();
 
                         case ("delete"):
+                            System.out.println(k.isDelete());
                             return k.isDelete();
 
                         case ("edit"):
+                            System.out.println(k.isEdit());
                             return k.isEdit();
 
                     }
@@ -187,27 +191,29 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean checkIfRootExists(String path){
         File f = new File(path);
-        if(f.exists()){
-            return true;
-        }else{
-            return false;
-        }
+        return f.exists();
     }
 
     @Override
-    public void createFile(String path, String fileName){
+    public boolean createFile(String path, String fileName){
 
-        int fs = countFiles();
-        double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-        if(i > fs) {
-            String p = path + "\\" + fileName;
-            File f = new File(p);
-            try {
-                f.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+        if(checkPrivileges("write")) {
+            int fs = countFiles();
+            double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+            if (i > fs) {
+                String p = path + "\\" + fileName;
+                File f = new File(p);
+
+                try {
+                    f.createNewFile();
+                    return true;
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+
             }
         }
+        return false;
     }
 
     @Override
@@ -230,86 +236,107 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     /**Proveriiti da li ovo sme*/
 
     @Override
-    public void createFolder(String path, String folderName){
-        int fs = countFiles();
-        double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-        if(i > fs) {
-            String p = path + "\\" + folderName;
-            File f = new File(p);
-            f.mkdir();
-        }
-    }
-
-    @Override
-    public void deleteFile(String path, String name) {
-        //proveravanje privilegije
-        try {
-            File f = new File(path + "\\" + name);
-            f.delete();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void deleteFolder(String path, String name) {
-        //proveravanje privilegije
-
-        File file = new File(path + "\\" + name);
-        String[] files = file.list();
-        if(files.length > 0) {
-            for (String s : files) {
-                File currentFile = new File(file.getPath(), s);
-                currentFile.delete();
+    public boolean createFolder(String path, String folderName){
+        if(checkPrivileges("write")) {
+            int fs = countFiles();
+            double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+            if (i > fs) {
+                String p = path + "\\" + folderName;
+                File f = new File(p);
+                f.mkdir();
+                return true;
             }
-        }else{
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteFile(String path, String name) {
+        if(checkPrivileges("delete")) {
+            try {
+                File f = new File(path + "\\" + name);
+                System.out.println(f);
+                f.delete();
+                return true;
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteFolder(String path, String name) {
+
+        if(checkPrivileges("delete")) {
+            File file = new File(path + "\\" + name);
+            String[] files = file.list();
+            System.out.println(file.getTotalSpace());
+            if (files.length > 0) {
+                for (String s : files) {
+                    File currentFile = new File(file.getPath(), s);
+                    currentFile.delete();
+                    return true;
+                }
+            }
             file.delete();
+            return true;
         }
-        file.delete();
+        return false;
     }
 
     @Override
-    public void moveFromTo(String fromPath, String toPath, String file) {
+    public boolean moveFromTo(String fromPath, String toPath, String file) {
 
-        try {
-            Files.move(Paths.get(fromPath + "\\" + file), Paths.get(toPath + "\\" + file), StandardCopyOption.REPLACE_EXISTING);
+        if(checkPrivileges("edit")) {
+            try {
+                Files.move(Paths.get(fromPath + "\\" + file), Paths.get(toPath + "\\" + file), StandardCopyOption.REPLACE_EXISTING);
+                return true;
 
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
-
-
+        return false;
     }
 
     @Override
-    public void downloadFile(String path, String filename) {
+    public boolean downloadFile(String path, String filename) {
 
-        try {
+        if(checkPrivileges("read")) {
+            try {
 
-            Files.copy(Paths.get(path + "\\" + filename), Paths.get("C:\\Users\\milja\\Downloads\\" + filename), StandardCopyOption.COPY_ATTRIBUTES);
+                Files.copy(Paths.get(path + "\\" + filename), Paths.get("C:\\Users\\milja\\Downloads\\" + filename), StandardCopyOption.COPY_ATTRIBUTES);
+                return true;
 
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
+        return false;
     }
 
     @Override
-    public void copyPasteFiles(String fromFolder, String toFolder, String filename) {
+    public boolean copyPasteFiles(String fromFolder, String toFolder, String filename) {
 
-        try{
+        if(checkPrivileges("edit")) {
+            try {
 
-            Files.copy(Paths.get(fromFolder  + "\\" + filename), Paths.get(toFolder + "\\" + filename), StandardCopyOption.COPY_ATTRIBUTES);
+                Files.copy(Paths.get(fromFolder + "\\" + filename), Paths.get(toFolder + "\\" + filename), StandardCopyOption.COPY_ATTRIBUTES);
+                return true;
 
-        }catch(Exception e){
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        return false;
     }
 
     @Override
     public int countFiles() {
         try (Stream<Path> files = Files.list(Paths.get(rootDirectoryPath))) {
-            int count = (int) files.count();
-            return count;
+            return (int) files.count();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -352,7 +379,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean updateConfig(String path, int size, String filetype, int maxNumber) {
 
-            if(checkPrivileges("read") && checkPrivileges("write") && checkPrivileges("edit") && checkPrivileges("delete")) {
+            if(checkPrivileges("edit")) {
                 path = rootDirectoryPath + "\\" + "config.json";
                 String admin = checkAdmin(path);
                 Map<String, Object> map = mapConfig(size, filetype, maxNumber, admin);
@@ -397,7 +424,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean addUser(String path, String name, String password, String privilege) {
 
-        if(checkPrivileges("read") && checkPrivileges("write") && checkPrivileges("edit") && checkPrivileges("delete")) {
+        if(checkPrivileges("edit")) {
             try {
                 if (privilege.equals("1")) {
                     path = rootDirectoryPath + "\\" + "users.json";
@@ -406,9 +433,10 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
                 }
                 if (privilege.equals("2")) {
                     path = rootDirectoryPath + "\\" + "users.json";
-                    List<Korisnik> korisnici = loadUsers(name, password, false, true, true, false);
+                    List<Korisnik> korisnici = loadUsers(name, password, false, true, true, true);
                     makeUser(path, korisnici);
                 }
+
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
