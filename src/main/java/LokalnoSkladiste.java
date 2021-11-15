@@ -201,7 +201,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
         if(checkPrivileges("write")) {
             int fs = countFiles();
             double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-            if (i > fs) {
+            long fm = countFilesMemory();
+            double j = Double.parseDouble(checkConfigType(path, "sizeOfDir").toString());
+            if (i > fs && j > fm) {
                 String p = path + "\\" + fileName;
                 File f = new File(p);
 
@@ -242,7 +244,9 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
             System.out.println("dal ovde udje");
             int fs = countFiles();
             double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
-            if (i > fs) {
+            long fm = countFilesMemory();
+            double j = Double.parseDouble(checkConfigType(path, "sizeOfDir").toString());
+            if (i > fs && j > fm) {
                 String p = path + "\\" + folderName;
                 File f = new File(p);
                 f.mkdir();
@@ -341,6 +345,17 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
             return (int) files.count();
         }catch (Exception e){
             e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public long countFilesMemory() {
+        long m = 0;
+        for (String f: listFiles(rootDirectoryPath)){
+            File file = new File(f);
+            m+=file.getTotalSpace();
+            return m;
         }
         return 0;
     }
