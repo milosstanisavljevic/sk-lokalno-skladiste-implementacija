@@ -179,6 +179,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
             try {
                 makeDefaultConfig(path, username);
                 makeDefaultUser(path, username, password);
+                connectedUser = username;
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -230,7 +231,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
         int fs = countFiles();
         double br = Double.parseDouble(checkConfigType(path,"maxNumber").toString());
         if (br>fs) {
-            super.createMoreFolders(path, n);
+            super.createMoreFolders(path,n);
         }
     }
     /**Proveriiti da li ovo sme*/
@@ -238,6 +239,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean createFolder(String path, String folderName){
         if(checkPrivileges("write")) {
+            System.out.println("dal ovde udje");
             int fs = countFiles();
             double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
             if (i > fs) {
