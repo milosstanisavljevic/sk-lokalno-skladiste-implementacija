@@ -203,7 +203,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
             double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
             long fm = countFilesMemory();
             double j = Double.parseDouble(checkConfigType(path, "sizeOfDir").toString());
-            if (i > fs && j > fm) {
+            if (i > fs && j >= fm) {
                 String p = path + "\\" + fileName;
                 File f = new File(p);
 
@@ -246,7 +246,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
             double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
             long fm = countFilesMemory();
             double j = Double.parseDouble(checkConfigType(path, "sizeOfDir").toString());
-            if (i > fs && j > fm) {
+            if (i > fs && j >= fm) {
                 String p = path + "\\" + folderName;
                 File f = new File(p);
                 f.mkdir();
