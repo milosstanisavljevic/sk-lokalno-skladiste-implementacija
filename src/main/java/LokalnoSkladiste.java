@@ -149,6 +149,12 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     }
 
     @Override
+    public String getPath() {
+
+        return rootDirectoryPath;
+    }
+
+    @Override
     public void createMoreFiles(String path, int n, String filetype) {
         int fs = countFiles();
         double br =Double.parseDouble(checkConfigType(rootDirectoryPath, "maxNumber").toString());
