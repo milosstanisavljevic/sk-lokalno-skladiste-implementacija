@@ -38,90 +38,18 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     }
 
     @Override
-    public boolean checkPrivileges(String privilege) {
-
-        try {
-            String path = rootDirectoryPath + "\\" + "users.json";
-            Type type = new TypeToken<Korisnik[]>() {
-            }.getType();
-            Gson gson = new Gson();
-            JsonReader reader = new JsonReader(new FileReader(path));
-            Korisnik[] data = gson.fromJson(reader, type);
-
-            for (Korisnik k : data) {
-                if(k.getUsername().equalsIgnoreCase(connectedUser)) {
-                    switch (privilege) {
-
-                        case ("read"):
-                            System.out.println(k.isRead());
-                            return k.isRead();
-
-                        case ("write"):
-                            System.out.println(k.isWrite());
-                            return k.isWrite();
-
-                        case ("delete"):
-                            System.out.println(k.isDelete());
-                            return k.isDelete();
-
-                        case ("edit"):
-                            System.out.println(k.isEdit());
-                            return k.isEdit();
-
-                    }
-                }
-            }
-            return false;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
+    public boolean checkPrivileges(String privilege, String path, String connectedUser) {
+        return super.checkPrivileges(privilege, path, connectedUser);
     }
 
     @Override
     public String checkAdmin(String path) {
-        try {
-            String admin = "";
-
-            Gson gson = new Gson();
-            Reader reader = Files.newBufferedReader(Paths.get(path));
-            Map<String, Object> map = gson.fromJson(reader, Map.class);
-
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                if (entry.getKey().equalsIgnoreCase("admin")) {
-                    admin += entry.getValue().toString();
-                }
-            }
-            reader.close();
-            return admin;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return super.checkAdmin(path);
     }
 
     @Override
     public Object checkConfigType(String path, String key) {
-        try {
-            Object value = null;
-            path = rootDirectoryPath + "\\config.json";
-
-            Gson gson = new Gson();
-            Reader reader = Files.newBufferedReader(Paths.get(path));
-            Map<String, Object> map = gson.fromJson(reader, Map.class);
-
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                if (entry.getKey().equalsIgnoreCase(key)) {
-                    value = entry.getValue();
-                }
-            }
-            reader.close();
-            return value;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return super.checkConfigType(path, key);
     }
 
     @Override
@@ -171,7 +99,8 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     }
 
     @Override
-    public boolean createRoot(String path, String username, String password){
+    public boolean createRoot(String path, String name, String username, String password){
+        path = path + "\\" + name;
         File root = new File(path);
         setRootDirectoryPath(path);
         boolean b = root.mkdir();
@@ -198,11 +127,11 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean createFile(String path, String fileName){
 
-        if(checkPrivileges("write")) {
+        if(checkPrivileges("write", rootDirectoryPath, connectedUser)) {
             int fs = countFiles();
-            double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+            double i = Double.parseDouble(checkConfigType(rootDirectoryPath, "maxNumber").toString());
             long fm = countFilesMemory();
-            double j = Double.parseDouble(checkConfigType(path, "sizeOfDir").toString());
+            double j = Double.parseDouble(checkConfigType(rootDirectoryPath, "sizeOfDir").toString());
             if (i > fs && j >= fm) {
                 String p = path + "\\" + fileName;
                 File f = new File(p);
@@ -222,7 +151,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public void createMoreFiles(String path, int n, String filetype) {
         int fs = countFiles();
-        double br =Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+        double br =Double.parseDouble(checkConfigType(rootDirectoryPath, "maxNumber").toString());
         if(br>fs) {
             super.createMoreFiles(path, n, filetype);
         }
@@ -231,7 +160,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public void createMoreFolders(String path, int n) {
         int fs = countFiles();
-        double br = Double.parseDouble(checkConfigType(path,"maxNumber").toString());
+        double br = Double.parseDouble(checkConfigType(rootDirectoryPath,"maxNumber").toString());
         if (br>fs) {
             super.createMoreFolders(path,n);
         }
@@ -240,12 +169,12 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
 
     @Override
     public boolean createFolder(String path, String folderName){
-        if(checkPrivileges("write")) {
+        if(checkPrivileges("write", rootDirectoryPath, connectedUser)) {
             System.out.println("dal ovde udje");
             int fs = countFiles();
-            double i = Double.parseDouble(checkConfigType(path, "maxNumber").toString());
+            double i = Double.parseDouble(checkConfigType(rootDirectoryPath, "maxNumber").toString());
             long fm = countFilesMemory();
-            double j = Double.parseDouble(checkConfigType(path, "sizeOfDir").toString());
+            double j = Double.parseDouble(checkConfigType(rootDirectoryPath, "sizeOfDir").toString());
             if (i > fs && j >= fm) {
                 String p = path + "\\" + folderName;
                 File f = new File(p);
@@ -258,7 +187,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
 
     @Override
     public boolean deleteFile(String path, String name) {
-        if(checkPrivileges("delete")) {
+        if(checkPrivileges("delete", rootDirectoryPath, connectedUser)) {
             try {
                 File f = new File(path + "\\" + name);
                 System.out.println(f);
@@ -275,7 +204,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean deleteFolder(String path, String name) {
 
-        if(checkPrivileges("delete")) {
+        if(checkPrivileges("delete", rootDirectoryPath, connectedUser)) {
             File file = new File(path + "\\" + name);
             String[] files = file.list();
             System.out.println(file.getTotalSpace());
@@ -295,7 +224,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean moveFromTo(String fromPath, String toPath, String file) {
 
-        if(checkPrivileges("edit")) {
+        if(checkPrivileges("edit", rootDirectoryPath, connectedUser)) {
             try {
                 Files.move(Paths.get(fromPath + "\\" + file), Paths.get(toPath + "\\" + file), StandardCopyOption.REPLACE_EXISTING);
                 return true;
@@ -310,7 +239,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean downloadFile(String path, String filename) {
 
-        if(checkPrivileges("read")) {
+        if(checkPrivileges("read", rootDirectoryPath, connectedUser)) {
             try {
 
                 Files.copy(Paths.get(path + "\\" + filename), Paths.get("C:\\Users\\milja\\Downloads\\" + filename), StandardCopyOption.COPY_ATTRIBUTES);
@@ -326,7 +255,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean copyPasteFiles(String fromFolder, String toFolder, String filename) {
 
-        if(checkPrivileges("edit")) {
+        if(checkPrivileges("edit",rootDirectoryPath, connectedUser)){
             try {
 
                 Files.copy(Paths.get(fromFolder + "\\" + filename), Paths.get(toFolder + "\\" + filename), StandardCopyOption.COPY_ATTRIBUTES);
@@ -396,7 +325,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean updateConfig(String path, int size, String filetype, int maxNumber) {
 
-            if(checkPrivileges("edit")) {
+            if(checkPrivileges("edit",rootDirectoryPath, connectedUser)) {
                 path = rootDirectoryPath + "\\" + "config.json";
                 String admin = checkAdmin(path);
                 Map<String, Object> map = mapConfig(size, filetype, maxNumber, admin);
@@ -441,7 +370,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     @Override
     public boolean addUser(String path, String name, String password, String privilege) {
 
-        if(checkPrivileges("edit")) {
+        if(checkPrivileges("edit",rootDirectoryPath, connectedUser)) {
             try {
                 if (privilege.equals("1")) {
                     path = rootDirectoryPath + "\\" + "users.json";
