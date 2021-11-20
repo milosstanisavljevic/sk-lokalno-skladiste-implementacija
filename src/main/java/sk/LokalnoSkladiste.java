@@ -115,7 +115,7 @@ public class LokalnoSkladiste extends SpecifikacijaSkladista {
     }
 
     @Override
-    public boolean checkIfRootExists(String path){
+    public boolean checkIfRootExists(String path, String name){
         File f = new File(path);
         return f.exists();
     }
